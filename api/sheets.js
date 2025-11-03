@@ -3,6 +3,83 @@ import { google } from 'googleapis';
 const SPREADSHEET_ID = '1HgpTFqxJ-foW4o_4GnwVjhGNf73GZZXPS9Nxy5BtYPg';
 const SHEET_NAME = 'Sheet1'; // Change if your sheet has a different name
 
+// Only allow updates to these fields
+const ALLOWED_UPDATE_FIELDS = ['claimedBy', 'claimedDate'];
+
+// Rate limiting: simple in-memory store (resets on serverless function restart)
+const rateLimitStore = new Map();
+const RATE_LIMIT_MAX_REQUESTS = 20;
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+
+// Allowed origins for CORS
+function getAllowedOrigins() {
+  const origins = ['http://localhost:3000']; // Local development
+  if (process.env.ALLOWED_ORIGINS) {
+    origins.push(...process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()));
+  }
+  // Add Vercel deployment URL if available
+  if (process.env.VERCEL_URL) {
+    origins.push(`https://${process.env.VERCEL_URL}`);
+  }
+  return origins;
+}
+
+// Check rate limit
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const key = ip;
+  
+  if (!rateLimitStore.has(key)) {
+    rateLimitStore.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+  
+  const limit = rateLimitStore.get(key);
+  
+  // Reset if window expired
+  if (now > limit.resetTime) {
+    rateLimitStore.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+  
+  // Check if over limit
+  if (limit.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+  
+  limit.count++;
+  return true;
+}
+
+// Sanitize value to prevent formula injection in Google Sheets
+function sanitizeSheetValue(value) {
+  if (typeof value !== 'string') {
+    value = String(value);
+  }
+  
+  // Prevent formula injection by prefixing dangerous characters with single quote
+  // Google Sheets will treat it as text if it starts with a quote
+  if (value.startsWith('=') || value.startsWith('+') || value.startsWith('-') || value.startsWith('@')) {
+    return "'" + value;
+  }
+  
+  // Limit length to prevent abuse
+  if (value.length > 200) {
+    return value.slice(0, 200);
+  }
+  
+  return value;
+}
+
+// Validate ID format
+function validateId(id) {
+  if (!id || typeof id !== 'string') {
+    return false;
+  }
+  // Allow alphanumeric, dashes, underscores only
+  return /^[a-zA-Z0-9_-]+$/.test(id.trim());
+}
+
 // Get credentials from environment variable (for Vercel)
 // For local development, try reading from file if env var not set
 async function getCredentials() {
@@ -10,7 +87,7 @@ async function getCredentials() {
     try {
       return JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
     } catch (e) {
-      throw new Error('Failed to parse GOOGLE_SERVICE_ACCOUNT: ' + e.message);
+      throw new Error('Failed to parse GOOGLE_SERVICE_ACCOUNT');
     }
   }
   
@@ -25,7 +102,7 @@ async function getCredentials() {
     const fileContents = fs.readFileSync(credentialsPath, 'utf8');
     return JSON.parse(fileContents);
   } catch (e) {
-    throw new Error('GOOGLE_SERVICE_ACCOUNT not set and file not found: ' + e.message);
+    throw new Error('GOOGLE_SERVICE_ACCOUNT not set and file not found');
   }
 }
 
@@ -41,10 +118,30 @@ function rowToObject(headers, row) {
 }
 
 export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  // Get client IP for rate limiting
+  const clientIp = req.headers['x-forwarded-for']?.split(',')[0] || 
+                   req.headers['x-real-ip'] || 
+                   req.connection?.remoteAddress || 
+                   'unknown';
+
+  // Check rate limit
+  if (!checkRateLimit(clientIp)) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  }
+
+  // Set CORS headers - whitelist specific origins
+  const allowedOrigins = getAllowedOrigins();
+  const origin = req.headers.origin;
+  
+  // Allow requests without Origin header (same-origin) or from allowed origins
+  if (!origin || allowedOrigins.includes(origin)) {
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'GET, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
+  }
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -90,12 +187,30 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PATCH') {
+      // Validate request body
+      if (!req.body || typeof req.body !== 'object' || !req.body.data) {
+        return res.status(400).json({ error: 'Invalid request body' });
+      }
+
       // Update a gift (claim it)
       const { id } = req.query;
       const { data } = req.body;
 
-      if (!id) {
-        return res.status(400).json({ error: 'ID is required' });
+      // Validate ID
+      if (!id || !validateId(id)) {
+        return res.status(400).json({ error: 'Invalid or missing ID' });
+      }
+
+      // Whitelist only allowed fields
+      const sanitizedData = {};
+      Object.keys(data).forEach(key => {
+        if (ALLOWED_UPDATE_FIELDS.includes(key)) {
+          sanitizedData[key] = sanitizeSheetValue(data[key]);
+        }
+      });
+
+      if (Object.keys(sanitizedData).length === 0) {
+        return res.status(400).json({ error: 'No valid fields to update' });
       }
 
       // Get all rows to find the one to update
@@ -111,18 +226,25 @@ export default async function handler(req, res) {
 
       const headers = rows[0];
       const idColumnIndex = headers.indexOf('id');
+      
+      if (idColumnIndex === -1) {
+        return res.status(500).json({ error: 'ID column not found in sheet' });
+      }
+
+      // Find the row with matching ID (strict type checking)
+      const idString = String(id).trim();
       const rowIndex = rows.findIndex((row, index) => {
         if (index === 0) return false; // Skip header
-        return row[idColumnIndex] === id || row[idColumnIndex] === id.toString();
+        return String(row[idColumnIndex] || '').trim() === idString;
       });
 
       if (rowIndex === -1) {
         return res.status(404).json({ error: 'Gift not found' });
       }
 
-      // Find the columns to update
+      // Build updates only for whitelisted fields
       const updates = [];
-      Object.keys(data).forEach(key => {
+      Object.keys(sanitizedData).forEach(key => {
         const colIndex = headers.indexOf(key);
         if (colIndex !== -1) {
           // Convert column index to letter (A, B, C, etc.)
@@ -135,7 +257,7 @@ export default async function handler(req, res) {
           
           updates.push({
             range: `${SHEET_NAME}!${colLetter}${rowIndex + 1}`,
-            values: [[data[key]]],
+            values: [[sanitizedData[key]]],
           });
         }
       });
@@ -157,8 +279,10 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (error) {
+    // Log full error for debugging (server-side only)
     console.error('Google Sheets API error:', error);
-    return res.status(500).json({ error: error.message });
+    // Don't expose internal error details to client
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }
 
