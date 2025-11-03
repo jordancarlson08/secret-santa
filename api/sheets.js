@@ -80,6 +80,9 @@ export default async function handler(req, res) {
         if (!gift.id) {
           gift.id = (index + 2).toString(); // +2 because index is 0-based and row 1 is headers
         }
+        // Remove recipient field for privacy
+        delete gift.receipient;
+        delete gift.recipient; // Handle both spellings
         return gift;
       });
 
