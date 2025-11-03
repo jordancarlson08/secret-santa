@@ -17,30 +17,133 @@ function App() {
   const [userName, setUserName] = useState('')
 
   useEffect(() => {
-    fetchGifts()
-    // Load claimed gifts from localStorage
-    loadAllClaimedGifts()
+    // Use AbortController to cancel duplicate requests (e.g., from React StrictMode)
+    const abortController = new AbortController()
+
+    // Fetch gifts once and use the data for both unclaimed and claimed gifts
+    const initialize = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(API_URL, { signal: abortController.signal })
+        if (!response.ok) {
+          throw new Error('Failed to fetch gifts')
+        }
+        const allGifts = await response.json()
+        
+        // Process unclaimed gifts
+        const unclaimedGifts = allGifts.filter(gift => !gift.claimedBy || gift.claimedBy.trim() === '')
+        setGifts(unclaimedGifts)
+        
+        // Process claimed gifts using the same data
+        await loadAllClaimedGifts(allGifts)
+      } catch (err) {
+        // Ignore abort errors
+        if (err.name === 'AbortError') {
+          return
+        }
+        setError(err.message)
+        console.error('Error fetching gifts:', err)
+      } finally {
+        // Only update loading state if not aborted
+        if (!abortController.signal.aborted) {
+          setLoading(false)
+        }
+      }
+      
+      // Auto-fill name input with saved username
+      if (!abortController.signal.aborted) {
+        const savedUserName = localStorage.getItem('giftRegistryUserName')
+        if (savedUserName) {
+          setUserName(savedUserName)
+          setClaimName(savedUserName)
+        }
+      }
+    }
     
-    // Auto-fill name input with saved username
-    const savedUserName = localStorage.getItem('giftRegistryUserName')
-    if (savedUserName) {
-      setUserName(savedUserName)
-      setClaimName(savedUserName)
+    initialize()
+
+    // Cleanup: abort the request if component unmounts or effect re-runs
+    return () => {
+      abortController.abort()
     }
   }, [])
 
-  const loadAllClaimedGifts = () => {
-    // Load all claimed gifts from localStorage using single key
-    const savedGifts = localStorage.getItem('claimedGifts')
-    if (savedGifts) {
+  const loadAllClaimedGifts = async (allGiftsData = null) => {
+    // Check for old localStorage format and migrate if needed
+    const oldClaimedGifts = localStorage.getItem('claimedGifts')
+    if (oldClaimedGifts) {
       try {
-        const giftsArray = JSON.parse(savedGifts)
-        setMyClaimedGifts(giftsArray)
+        const oldGifts = JSON.parse(oldClaimedGifts)
+        if (Array.isArray(oldGifts) && oldGifts.length > 0) {
+          // Migrate: extract IDs from old format
+          const migratedIds = oldGifts.map(gift => gift.id).filter(id => id)
+          if (migratedIds.length > 0) {
+            localStorage.setItem('claimedGiftIds', JSON.stringify(migratedIds))
+          }
+          // Remove old format
+          localStorage.removeItem('claimedGifts')
+        }
       } catch (e) {
-        console.error('Error loading claimed gifts:', e)
-        setMyClaimedGifts([])
+        console.error('Error migrating old localStorage format:', e)
+        // If migration fails, remove old data
+        localStorage.removeItem('claimedGifts')
       }
-    } else {
+    }
+
+    // Load claimed gift IDs from localStorage
+    const savedGiftIds = localStorage.getItem('claimedGiftIds')
+    if (!savedGiftIds) {
+      setMyClaimedGifts([])
+      return
+    }
+
+    try {
+      const giftIds = JSON.parse(savedGiftIds)
+      if (!Array.isArray(giftIds) || giftIds.length === 0) {
+        setMyClaimedGifts([])
+        return
+      }
+
+      // Use provided data or fetch if not provided
+      let allGifts = allGiftsData
+      if (!allGifts) {
+        const response = await fetch(API_URL)
+        if (!response.ok) {
+          throw new Error('Failed to fetch gifts')
+        }
+        allGifts = await response.json()
+      }
+
+      // Filter gifts by stored IDs and check if they're still claimed
+      const validGiftIds = []
+      const claimedGifts = []
+
+      for (const giftId of giftIds) {
+        const gift = allGifts.find(g => g.id === giftId)
+        if (gift) {
+          // If claimedBy is empty, remove it from localStorage (gift was unclaimed)
+          if (!gift.claimedBy || gift.claimedBy.trim() === '') {
+            // Don't add to claimedGifts, and don't add ID to validGiftIds
+            continue
+          }
+          // Gift is still claimed, include it
+          claimedGifts.push(gift)
+          validGiftIds.push(giftId)
+        }
+      }
+
+      // Update localStorage to remove unclaimed gifts
+      if (validGiftIds.length !== giftIds.length) {
+        if (validGiftIds.length === 0) {
+          localStorage.removeItem('claimedGiftIds')
+        } else {
+          localStorage.setItem('claimedGiftIds', JSON.stringify(validGiftIds))
+        }
+      }
+
+      setMyClaimedGifts(claimedGifts)
+    } catch (e) {
+      console.error('Error loading claimed gifts:', e)
       setMyClaimedGifts([])
     }
   }
@@ -49,32 +152,41 @@ function App() {
     loadAllClaimedGifts()
   }
 
-  const saveClaimedGift = (gift, name) => {
-    const savedGifts = localStorage.getItem('claimedGifts')
-    let claimedGiftsArray = savedGifts ? JSON.parse(savedGifts) : []
+  const saveClaimedGift = (giftId, name, allGiftsData = null) => {
+    const savedGiftIds = localStorage.getItem('claimedGiftIds')
+    let claimedGiftIds = savedGiftIds ? JSON.parse(savedGiftIds) : []
     
-    // Add the new gift if it's not already in the list
-    const exists = claimedGiftsArray.find(g => g.id === gift.id)
-    if (!exists) {
-      claimedGiftsArray.push({
-        ...gift,
-        claimedBy: name,
-        claimedDate: new Date().toISOString()
-      })
-      localStorage.setItem('claimedGifts', JSON.stringify(claimedGiftsArray))
+    // Add the new gift ID if it's not already in the list
+    if (!claimedGiftIds.includes(giftId)) {
+      claimedGiftIds.push(giftId)
+      localStorage.setItem('claimedGiftIds', JSON.stringify(claimedGiftIds))
     }
     
     // Save the user's name for auto-fill
     localStorage.setItem('giftRegistryUserName', name)
     setUserName(name)
     
-    // Reload all claimed gifts
-    loadAllClaimedGifts()
+    // If we have all gifts data, update claimed gifts directly without another API call
+    if (allGiftsData) {
+      const claimedGifts = []
+      for (const id of claimedGiftIds) {
+        const gift = allGiftsData.find(g => g.id === id)
+        if (gift && gift.claimedBy && gift.claimedBy.trim() !== '') {
+          claimedGifts.push(gift)
+        }
+      }
+      setMyClaimedGifts(claimedGifts)
+    } else {
+      // Reload all claimed gifts from API (only if we don't have the data)
+      loadAllClaimedGifts()
+    }
   }
 
-  const fetchGifts = async () => {
+  const fetchGifts = async (showLoading = true) => {
     try {
-      setLoading(true)
+      if (showLoading) {
+        setLoading(true)
+      }
       setError(null)
       const response = await fetch(API_URL)
       if (!response.ok) {
@@ -84,11 +196,15 @@ function App() {
       // Filter out claimed gifts (where claimedBy is not empty)
       const unclaimedGifts = data.filter(gift => !gift.claimedBy || gift.claimedBy.trim() === '')
       setGifts(unclaimedGifts)
+      return data // Return all gifts for use in claimGift
     } catch (err) {
       setError(err.message)
       console.error('Error fetching gifts:', err)
+      return null
     } finally {
-      setLoading(false)
+      if (showLoading) {
+        setLoading(false)
+      }
     }
   }
 
@@ -105,6 +221,20 @@ function App() {
       // Get current timestamp in ISO format
       const claimedDate = new Date().toISOString()
       
+      // Show confirmation immediately with local data (optimistic update)
+      const optimisticGift = {
+        ...giftToClaim,
+        claimedBy: name.trim(),
+        claimedDate: claimedDate
+      }
+      setConfirmedGift(optimisticGift)
+      
+      // Remove claimed gift from list immediately
+      setGifts(gifts.filter(gift => gift.id !== giftId))
+      setClaimName('')
+      setClaimingId(null)
+
+      // Make the PATCH request
       const response = await fetch(`${API_URL}?id=${giftId}`, {
         method: 'PATCH',
         headers: {
@@ -122,22 +252,28 @@ function App() {
         throw new Error('Failed to claim gift')
       }
 
-      // Store confirmed gift with user's name
-      const claimedGiftData = {
-        ...giftToClaim,
-        claimedBy: name.trim(),
-        claimedDate: claimedDate
+      // Refresh data in the background (without showing loading)
+      // Fetch once to get all updated data
+      const allGiftsData = await fetchGifts(false) // Don't show loading
+      
+      if (allGiftsData) {
+        // Update confirmed gift with fresh data from API
+        const updatedGift = allGiftsData.find(g => g.id === giftId)
+        if (updatedGift) {
+          setConfirmedGift(updatedGift)
+        }
+        
+        // Update claimed gifts list using the fetched data
+        saveClaimedGift(giftId, name.trim(), allGiftsData)
+      } else {
+        // Fallback: just save the ID and refresh claimed gifts normally
+        saveClaimedGift(giftId, name.trim())
       }
-      setConfirmedGift(claimedGiftData)
-
-      // Save to localStorage
-      saveClaimedGift(giftToClaim, name.trim())
-
-      // Remove claimed gift from list
-      setGifts(gifts.filter(gift => gift.id !== giftId))
-      setClaimName('')
-      setClaimingId(null)
     } catch (err) {
+      // Revert optimistic update on error
+      setConfirmedGift(null)
+      // Re-add gift to list
+      await fetchGifts(false)
       setError(err.message)
       console.error('Error claiming gift:', err)
       alert('Failed to claim gift. Please try again.')
