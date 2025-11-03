@@ -374,10 +374,37 @@ Claimed by: ${confirmedGift.claimedBy}`
     setClaimName('')
   }
 
+  // Skeleton Loading Component
+  const SkeletonGiftCard = () => (
+    <div className="gift-card skeleton-gift-card">
+      <div className="gift-image">
+        <div className="skeleton-image shimmer"></div>
+      </div>
+      <div className="gift-content">
+        <div className="skeleton-text medium shimmer"></div>
+        <div className="skeleton-text short shimmer"></div>
+        <button className="claim-button" disabled>
+          Give this gift
+        </button>
+      </div>
+    </div>
+  )
+
   if (loading) {
     return (
       <div className="container">
-        <div className="loading">Loading gifts...</div>
+        <header>
+          <h1>Grove Park 6th Ward Sub-for-Santa</h1>
+          <p>Help spread joy this holiday season by selecting a gift to purchase</p>
+        </header>
+        <div className="gifts-grid">
+          <SkeletonGiftCard />
+          <SkeletonGiftCard />
+          <SkeletonGiftCard />
+          <SkeletonGiftCard />
+          <SkeletonGiftCard />
+          <SkeletonGiftCard />
+        </div>
       </div>
     )
   }
