@@ -1,0 +1,640 @@
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  color: #333;
+  margin-bottom: 40px;
+}
+
+header h1 {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  color: #2c1810;
+}
+
+header p {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  color: #2c1810;
+  margin: 40px 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e8ddd4;
+}
+
+.claimed-section {
+  margin-bottom: 40px;
+}
+
+.claimed-card {
+  border: 2px solid #28a745;
+  background: linear-gradient(135deg, #ffffff 0%, #f0fff4 100%);
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.claimed-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 12px rgba(40, 167, 69, 0.2);
+}
+
+.claimed-card::before {
+  content: '✓';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #28a745;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.claimed-badge {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: #28a745;
+  color: white;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.loading,
+.error,
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.error {
+  color: #d32f2f;
+  margin-bottom: 20px;
+}
+
+.retry-button {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 24px;
+  height: 48px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.retry-button:hover {
+  background: #5568d3;
+}
+
+.empty-state {
+  color: #666;
+}
+
+.gifts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.gift-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.gift-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gift-image {
+  width: 100%;
+  height: 200px;
+  background: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.gift-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gift-image.no-preview {
+  background: #e9ecef;
+}
+
+.no-preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #adb5bd;
+  gap: 8px;
+}
+
+.no-preview-placeholder svg {
+  opacity: 0.5;
+}
+
+.no-preview-placeholder span {
+  font-size: 0.85rem;
+  color: #adb5bd;
+}
+
+.gift-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.gift-title {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.gift-info {
+  margin: 8px 0;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.gift-info .label {
+  font-weight: 600;
+  color: #333;
+}
+
+.gift-badge {
+  display: inline-block;
+  background: #fff3cd;
+  color: #856404;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  margin: 8px 0;
+  width: fit-content;
+}
+
+.gift-badge.no-wrap {
+  background: #e7f3ff;
+  color: #004085;
+}
+
+.gift-notes {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f8f9fa;
+  border-left: 3px solid #667eea;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #555;
+  font-style: italic;
+}
+
+.gift-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+  margin: 12px 0;
+  display: inline-block;
+  transition: color 0.3s;
+}
+
+.gift-link:hover {
+  color: #5568d3;
+  text-decoration: underline;
+}
+
+.claim-form {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.name-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 12px;
+  transition: border-color 0.3s;
+}
+
+.name-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.claim-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.claim-button {
+  padding: 12px 24px;
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  margin-top: auto;
+  flex-shrink: 0;
+  flex-grow: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.claim-buttons .claim-button {
+  flex: 1;
+}
+
+.claim-button:hover:not(:disabled) {
+  background: #5568d3;
+  transform: translateY(-2px);
+}
+
+.claim-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.claim-button.submit {
+  background: #28a745;
+}
+
+.claim-button.submit:hover:not(:disabled) {
+  background: #218838;
+}
+
+.claim-button.cancel {
+  background: #6c757d;
+}
+
+.claim-button.cancel:hover {
+  background: #5a6268;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 2rem;
+  }
+
+  header p {
+    font-size: 1rem;
+  }
+
+  .gifts-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  .gift-content {
+    padding: 16px;
+  }
+
+  .claim-buttons {
+    flex-direction: column;
+  }
+
+  .claim-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.75rem;
+  }
+
+  .gift-title {
+    font-size: 1.25rem;
+  }
+}
+
+/* Confirmation Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.confirmation-modal {
+  background: white;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.confirmation-header {
+  text-align: center;
+  padding: 20px 24px 8px;
+  background: white;
+  border-radius: 16px 16px 0 0;
+}
+
+.confirmation-header h2 {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #333;
+}
+
+.confirmation-content {
+  padding: 12px 20px 20px;
+}
+
+.confirmed-gift-image {
+  width: 100%;
+  height: 150px;
+  background: #e9ecef;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.confirmed-gift-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.confirmed-gift-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.confirmed-item-name {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0;
+}
+
+.confirmed-notes {
+  padding: 12px;
+  background: #f8f9fa;
+  border-left: 3px solid #667eea;
+  border-radius: 4px;
+}
+
+.confirmed-notes strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.confirmed-notes p {
+  margin: 0;
+  color: #555;
+}
+
+.product-url-section {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #667eea;
+}
+
+.product-url-section strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.product-url-link {
+  color: #667eea;
+  word-break: break-all;
+  font-size: 0.9rem;
+  text-decoration: none;
+  display: block;
+}
+
+.product-url-link:hover {
+  text-decoration: underline;
+}
+
+.delivery-instructions {
+  padding: 16px;
+  background: #e7f3ff;
+  border-radius: 8px;
+  border: 2px solid #667eea;
+  margin-top: 8px;
+}
+
+.delivery-instructions h4 {
+  margin: 0 0 10px 0;
+  color: #004085;
+  font-size: 1.1rem;
+}
+
+.delivery-message {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #004085;
+  margin: 0;
+}
+
+.delivery-message strong {
+  color: #002752;
+}
+
+.recipient-info {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid #b8daff;
+  color: #004085;
+}
+
+.confirmation-actions {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 0 0 16px 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.save-title {
+  text-align: center;
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.save-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.save-button {
+  flex: 1;
+  padding: 16px 24px;
+  height: 56px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: white;
+}
+
+.calendar-button {
+  background: #28a745;
+}
+
+.calendar-button:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.clipboard-button {
+  background: #667eea;
+}
+
+.clipboard-button:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.close-confirmation-button {
+  width: 100%;
+  padding: 12px 24px;
+  height: 48px;
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.close-confirmation-button:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+}
+
+/* Mobile Responsive for Modal */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+
+  .confirmation-modal {
+    max-height: 95vh;
+  }
+
+  .confirmation-header {
+    padding: 24px 20px 20px;
+  }
+
+  .confirmation-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .confirmation-subtitle {
+    font-size: 1rem;
+  }
+
+  .confirmation-content {
+    padding: 20px;
+  }
+
+  .confirmed-gift-image {
+    height: 120px;
+  }
+
+  .confirmed-item-name {
+    font-size: 1.5rem;
+  }
+
+  .save-buttons {
+    flex-direction: column;
+  }
+
+  .save-button {
+    width: 100%;
+  }
+}
+

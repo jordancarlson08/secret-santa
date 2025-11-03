@@ -1,0 +1,152 @@
+[
+  {
+    "id": "1",
+    "item": "LEGO City Police Station",
+    "previewUrl": "https://m.media-amazon.com/images/I/81fYGKk6qLL._AC_SL1500_.jpg",
+    "shouldWrap": "TRUE",
+    "deliverTo": "Sara Biamonte",
+    "receipient": "Family One",
+    "url": "https://www.amazon.com/dp/B08G9PRS1K",
+    "other": "Ages 6-12, great for imaginative play"
+  },
+  {
+    "id": "2",
+    "item": "Nintendo Switch Controller",
+    "previewUrl": "https://m.media-amazon.com/images/I/71q7YyS4GLL._AC_SL1500_.jpg",
+    "shouldWrap": "TRUE",
+    "deliverTo": "Bishop Saban",
+    "receipient": "Family Two",
+    "url": "https://www.target.com/p/nintendo-switch-pro-controller/-/A-52686224",
+    "other": "Compatible with all Switch models"
+  },
+  {
+    "id": "3",
+    "item": "Winter Coats - Assorted Sizes",
+    "previewUrl": "",
+    "shouldWrap": "FALSE",
+    "deliverTo": "Josh Juncker",
+    "receipient": "Family Three",
+    "url": "",
+    "other": "Need sizes: Adult M, Adult L, Child M. Preferably dark colors"
+  },
+  {
+    "id": "4",
+    "item": "Children's Picture Books Set",
+    "previewUrl": "https://m.media-amazon.com/images/I/81RZgjD+TuL._AC_SL1500_.jpg",
+    "shouldWrap": "TRUE",
+    "deliverTo": "Sara Biamonte",
+    "receipient": "Family Four",
+    "url": "https://www.amazon.com/dp/B08G9PRS1K",
+    "other": "Ages 3-8, educational focus preferred"
+  },
+  {
+    "id": "5",
+    "item": "Kitchen Appliances Bundle",
+    "previewUrl": "",
+    "shouldWrap": "FALSE",
+    "deliverTo": "Bishop Saban",
+    "receipient": "Family One",
+    "url": "https://www.walmart.com/ip/Kitchen-Aid-Bundle/12345678",
+    "other": "Toaster, coffee maker, and mixer needed"
+  },
+  {
+    "id": "6",
+    "item": "Barbie Dreamhouse",
+    "previewUrl": "https://i5.walmartimages.com/asr/abc123def456.abc123.jpg",
+    "shouldWrap": "TRUE",
+    "deliverTo": "Josh Juncker",
+    "receipient": "Family Two",
+    "url": "https://www.target.com/p/barbie-dreamhouse/-/A-52686225",
+    "other": ""
+  },
+  {
+    "id": "7",
+    "item": "Board Games Collection",
+    "previewUrl": "https://m.media-amazon.com/images/I/91-KF1OjVRL._AC_SL1500_.jpg",
+    "shouldWrap": "TRUE",
+    "deliverTo": "Sara Biamonte",
+    "receipient": "Family Three",
+    "url": "https://www.amazon.com/dp/B08G9PRS1K",
+    "other": "Monopoly, Uno, and Scrabble preferred"
+  },
+  {
+    "id": "8",
+    "item": "Bicycle - Child Size",
+    "previewUrl": "",
+    "shouldWrap": "FALSE",
+    "deliverTo": "Bishop Saban",
+    "receipient": "Family Four",
+    "url": "",
+    "other": "Size for 8-10 year old, training wheels optional"
+  },
+  {
+    "id": "9",
+    "item": "Art Supplies Set",
+    "previewUrl": "https://i5.walmartimages.com/asr/def456ghi789.def456.jpg",
+    "shouldWrap": "TRUE",
+    "deliverTo": "Josh Juncker",
+    "receipient": "Family One",
+    "url": "https://www.target.com/p/crayola-art-supplies/-/A-52686226",
+    "other": "Markers, crayons, colored pencils, and sketch pads"
+  },
+  {
+    "id": "10",
+    "item": "Wireless Earbuds",
+    "previewUrl": "https://m.media-amazon.com/images/I/71bhWgQK-cL._AC_SL1500_.jpg",
+    "shouldWrap": "TRUE",
+    "deliverTo": "Sara Biamonte",
+    "receipient": "Family Two",
+    "url": "https://www.amazon.com/dp/B08G9PRS1K",
+    "other": "Preferably Apple AirPods or similar quality"
+  },
+  {
+    "id": "11",
+    "item": "Bedding Set - Queen Size",
+    "previewUrl": "",
+    "shouldWrap": "FALSE",
+    "deliverTo": "Bishop Saban",
+    "receipient": "Family Three",
+    "url": "https://www.walmart.com/ip/Queen-Bedding-Set/12345679",
+    "other": "Neutral colors preferred"
+  },
+  {
+    "id": "12",
+    "item": "Remote Control Car",
+    "previewUrl": "https://m.media-amazon.com/images/I/81Y7N5QJRGL._AC_SL1500_.jpg",
+    "shouldWrap": "TRUE",
+    "deliverTo": "Josh Juncker",
+    "receipient": "Family Four",
+    "url": "",
+    "other": "For ages 8+, rechargeable battery preferred"
+  },
+  {
+    "id": "13",
+    "item": "Puzzle Sets - Multiple",
+    "previewUrl": "https://i5.walmartimages.com/asr/ghi789jkl012.ghi789.jpg",
+    "shouldWrap": "TRUE",
+    "deliverTo": "Sara Biamonte",
+    "receipient": "Family One",
+    "url": "https://www.target.com/p/jigsaw-puzzles/-/A-52686227",
+    "other": "500-1000 piece puzzles for adults and kids"
+  },
+  {
+    "id": "14",
+    "item": "Soccer Ball and Gear",
+    "previewUrl": "",
+    "shouldWrap": "FALSE",
+    "deliverTo": "Bishop Saban",
+    "receipient": "Family Two",
+    "url": "https://www.amazon.com/dp/B08G9PRS1K",
+    "other": "Size 5 ball, shin guards, and cleats size 8"
+  },
+  {
+    "id": "15",
+    "item": "Educational Tablet",
+    "previewUrl": "https://m.media-amazon.com/images/I/61jYjeuNUnL._AC_SL1500_.jpg",
+    "shouldWrap": "TRUE",
+    "deliverTo": "Josh Juncker",
+    "receipient": "Family Three",
+    "url": "https://www.target.com/p/amazon-fire-kids-tablet/-/A-52686228",
+    "other": "Kid-friendly with parental controls, 8GB storage minimum"
+  }
+]
