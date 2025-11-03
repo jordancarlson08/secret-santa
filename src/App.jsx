@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
-const API_URL = 'https://sheetdb.io/api/v1/s4ntthbwf4egb'
+// API URL - will use relative path for both dev and production
+// For local dev, use: npx vercel dev
+// For production, this will automatically work with Vercel
+const API_URL = '/api/sheets'
 
 function App() {
   const [gifts, setGifts] = useState([])
@@ -102,7 +105,7 @@ function App() {
       // Get current timestamp in ISO format
       const claimedDate = new Date().toISOString()
       
-      const response = await fetch(`${API_URL}/id/${giftId}`, {
+      const response = await fetch(`${API_URL}?id=${giftId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

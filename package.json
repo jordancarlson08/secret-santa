@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:vercel": "vercel dev --yes",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "googleapis": "^164.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -19,4 +21,3 @@
     "vite": "^5.0.8"
   }
 }
-
