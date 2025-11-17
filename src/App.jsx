@@ -394,7 +394,7 @@ Claimed by: ${confirmedGift.claimedBy}`
     return (
       <div className="container">
         <header>
-          <h1>Grove Park 6th Ward Sub-for-Santa</h1>
+          <h1>Grove Park 6th Ward Giving Tree</h1>
           <p>Help spread joy this holiday season by selecting a gift to purchase</p>
         </header>
         <div className="gifts-grid">
@@ -537,7 +537,7 @@ Claimed by: ${confirmedGift.claimedBy}`
     <div className="container">
       <ConfirmationModal />
       <header>
-        <h1>Grove Park 6th Ward Sub-for-Santa</h1>
+        <h1>Grove Park 6th Ward Giving Tree</h1>
         <p>Help spread joy this holiday season by selecting a gift to purchase</p>
       </header>
 
